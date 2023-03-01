@@ -1,0 +1,46 @@
+Host {{ sre_server.host_name }}
+  Hostname {{ sre_server.host }}
+
+{% for server in consul_servers %}
+Host {{ server.host_name }}
+  Hostname {{ server.private_ip }}
+
+{% endfor %}
+
+{% for server in nomad_servers %}
+Host {{ server.host_name }}
+  Hostname {{ server.private_ip }}
+
+{% endfor %}
+
+{% for server in vault_servers %}
+Host {{ server.host_name }}
+  Hostname {{ server.private_ip }}
+
+{% endfor %}
+
+{% for server in client_servers %}
+Host {{ server.host_name }}
+  Hostname {{ server.private_ip }}
+
+{% endfor %}
+
+{% for server in observability_servers %}
+Host {{ server.host_name }}
+  Hostname {{ server.private_ip }}
+
+{% endfor %}
+
+Host {{ base_server_name }}-consul-server-* {{ base_server_name }}-nomad-server-* {{ base_server_name }}-vault-* {{ base_server_name }}-client-* {{ base_server_name }}-observability-*
+  ProxyJump {{ sre_server.host_name }}
+
+Host {{ base_server_name }}-*
+  User                  {{ current_ssh_user }}
+  IdentityFile          {{ private_key_file }}
+  StrictHostKeyChecking no
+  UserKnownHostsFile    /dev/null
+  ControlMaster         auto
+  ControlPath           ~/.ssh/mux-%r@%h:%p
+  ControlPersist        15m
+  ServerAliveInterval   100
+  TCPKeepAlive          yes

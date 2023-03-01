@@ -1,0 +1,31 @@
+---
+- name: Stage 0 - Infrastructure
+  hosts: localhost
+  become: false
+  gather_facts: false
+  vars:
+    hcloud_token: "{{ lookup('env', 'HETZNER_TOKEN') }}"
+    current_ssh_user: "{{ cloud_provider_config.sudo_user }}"
+    private_key_file: "{{ workspace_ssh_private_key_file }}"
+    terraform_module_work_dir: "{{ workspace_tf_modules_dir }}/hcloud"
+    separate_consul_servers: "{{ cluster_config.separate_consul_servers }}"
+    server_count: "{{ cluster_config.servers }}"
+    vault_count: "{{ cluster_config.vault_servers }}"
+    client_count: "{{ cluster_config.clients }}"
+    multi_instance_observability: "{{ cluster_config.multi_instance_observability }}"
+    server_location: "{{ cloud_provider_config.provider_settings.server_location }}"
+    load_balancer_location: "{{ cloud_provider_config.provider_settings.load_balancer_location }}"
+    network_location: "{{ cloud_provider_config.provider_settings.network_location }}"
+    server_instance_type: "{{ cloud_provider_config.provider_settings.server_instance_type }}"
+    client_instance_type: "{{ cloud_provider_config.provider_settings.client_instance_type }}"
+    observability_instance_type: "{{ cloud_provider_config.provider_settings.observability_instance_type }}"
+    load_balancer_type: "{{ cloud_provider_config.provider_settings.load_balancer_type }}"
+    vault_volume_size: "{{ cluster_config.vault_volume_size }}"
+    consul_volume_size: "{{ cluster_config.consul_volume_size }}"
+    client_volumes: "{{ cluster_config.client_volumes }}"
+    base_server_name: "{{ cloud_provider_config.provider_settings.resource_names.base_server_name }}"
+    network_name: "{{ cloud_provider_config.provider_settings.resource_names.network_name }}"
+    firewall_name: "{{ cloud_provider_config.provider_settings.resource_names.firewall_name }}"
+  roles:
+    - role: hcloud
+      tags: always

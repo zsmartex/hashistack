@@ -1,0 +1,22 @@
+---
+collection_root: "{{ (playbook_dir) | realpath }}"
+collection_tf_modules_dir: "{{ collection_root }}/terraform"
+
+tf_action: apply # apply or destroy
+
+workspace_name: "Hashistack"
+workspace_root: "{{ lookup('env', 'PWD') }}"
+workspace_host_vars_dir: "{{ workspace_root }}/host_vars"
+workspace_group_vars_dir: "{{ workspace_root }}/group_vars"
+workspace_group_vars_dir_relative_dir: "./group_vars/hashistack"
+workspace_tf_modules_dir: "{{ workspace_host_vars_dir }}/terraform"
+workspace_secrets_dir: "{{ workspace_group_vars_dir }}/secrets"
+workspace_secrets_dir_relative_dir: "{{ workspace_group_vars_dir_relative_dir }}/secrets"
+workspace_ssh_private_key_file: "{{ workspace_secrets_dir }}/default.key"
+workspace_ssh_private_key_file_relative_path: "{{ workspace_secrets_dir_relative_dir }}/default.key"
+
+host_vars_dir: "{{ workspace_host_vars_dir }}/{{ inventory_hostname }}"
+host_secrets_dir: "{{ host_vars_dir }}/secrets"
+
+tf_module_src: "{{ collection_tf_modules_dir }}/{{ tf_module_name }}/"
+tf_module_dest: "{{ workspace_tf_modules_dir }}/{{ tf_module_name }}"

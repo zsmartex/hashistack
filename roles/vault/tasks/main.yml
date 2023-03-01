@@ -1,0 +1,37 @@
+---
+- name: Load os-specific vars
+  include_vars: "{{ _current_os_vars }}"
+  with_first_found:
+    - skip: true
+      files: "{{ __role_vars_precedence }}"
+  loop_control:
+    loop_var: _current_os_vars
+  tags: always
+
+- name: Execute os-specific tasks
+  include_tasks: "{{ _current_os_tasks }}"
+  with_first_found:
+    - skip: true
+      files: "{{ __role_tasks_precedence }}"
+  loop_control:
+    loop_var: _current_os_tasks
+  tags: always
+
+- name: Start master vault services
+  systemd:
+    state: started
+    name: vault
+    daemon_reload: true
+    enabled: true
+
+- name: In-place init-unseal
+  include_tasks: _inplace_init_unseal.yml
+  when:
+    - vault_unseal_method == 'in-place'
+
+- name: Configure Vault instance using terraform
+  include_tasks: _tf_configure.yml
+
+- name: Flush before leaving
+  meta: flush_handlers
+  tags: always

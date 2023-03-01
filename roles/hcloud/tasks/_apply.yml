@@ -1,0 +1,57 @@
+---
+- name: Apply
+  debug:
+    msg: "Starting apply phase"
+    verbosity: 1
+
+- name: APPLY - Create a dedicated keypair
+  community.crypto.openssh_keypair:
+    path: "{{ private_key_file }}"
+    type: ed25519
+
+- name: APPLY - Copy terraform sources    # noqa risky-file-permissions
+  copy:
+    src: "files/"
+    dest: "{{ __terraform_module_working_dir }}/"
+
+- name: "Terraform {{ tf_action }}"
+  include_tasks: _terraform.yml
+  tags:
+    - tf
+
+- name: APPLY - Terraform output extract
+  set_fact:
+    sre_server: "{{ tf_result.outputs.sre_server.value }}"
+    consul_servers: "{{ tf_result.outputs.consul_servers.value }}"
+    nomad_servers: "{{ tf_result.outputs.nomad_servers.value }}"
+    vault_servers: "{{ tf_result.outputs.vault_servers.value }}"
+    client_servers: "{{ tf_result.outputs.client_servers.value }}"
+    observability_servers: "{{ tf_result.outputs.observability_servers.value }}"
+  tags:
+    - outputs
+    - molecule-notest
+
+- name: Add hosts to ssh config
+  blockinfile:
+    path: "{{ workspace_root }}/ssh.cfg"
+    state: present
+    create: true
+    mode: 0640
+    marker: "{{ __block_marker }}"
+    block: |
+      {{ lookup('template', '_ssh_cfg.j2') }}
+  tags:
+    - outputs
+
+- name: Add hosts to inventory
+  blockinfile:
+    path: "{{ workspace_root }}/inventory"
+    state: present
+    create: true
+    mode: 0640
+    marker: "{{ __block_marker }}"
+    block: |
+      {{ lookup('template', '_inventory.j2') }}
+  tags:
+    - outputs
+    - molecule-notest

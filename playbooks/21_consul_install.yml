@@ -1,0 +1,41 @@
+---
+- name: Stage 2 - Copy certificate to consul servers
+  hosts: hashistack_cluster
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Creates config dir
+      file:
+        path: /etc/consul.d
+        state: directory
+        owner: consul
+        group: consul
+        mode: 0755
+    - name: Creates ssl dir
+      file:
+        path: /etc/consul.d/ssl
+        state: directory
+        owner: consul
+        group: consul
+        mode: 0755
+    - name: Copy consul server certificates
+      copy:
+        src: "{{ workspace_secrets_dir }}/consul/{{ item }}"
+        dest: /etc/consul.d/ssl/{{ item }}
+        owner: consul
+        group: consul
+        mode: 0755
+      with_items:
+        - consul-ca.pem
+        - consul-ca-key.pem
+        - server.pem
+        - server-key.pem
+        - server-fullchain.pem
+
+- name: Stage 2 - Setup bootstrap consul
+  hosts: hashistack_cluster
+  become: true
+  gather_facts: true
+  roles:
+    - role: consul
+    - role: envoy

@@ -1,0 +1,29 @@
+---
+- name: Create private key
+  community.crypto.openssl_privatekey:
+    path: "{{ ca_private_key_path }}"
+
+- name: Create certificate signing request (CSR) for CA certificate
+  community.crypto.openssl_csr_pipe:
+    privatekey_path: "{{ ca_private_key_path }}"
+    common_name: "{{ ca_common_name }}"
+    country_name: "VN"
+    organization_name: "ZSmartex"
+    organizational_unit_name: "zsmartex.com"
+    locality_name: "HaiPhong City"
+    email_address: "huuhadz2k@gmail.com"
+    use_common_name_for_san: false
+    basic_constraints:
+      - 'CA:TRUE'
+    basic_constraints_critical: true
+    key_usage:
+      - keyCertSign
+    key_usage_critical: true
+  register: ca_csr
+
+- name: Create self-signed CA certificate from CSR
+  community.crypto.x509_certificate:
+    path: "{{ ca_certificate_path }}"
+    csr_content: "{{ ca_csr.csr }}"
+    privatekey_path: "{{ ca_private_key_path }}"
+    provider: selfsigned

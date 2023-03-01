@@ -1,0 +1,61 @@
+---
+- name: Create private key
+  community.crypto.openssl_privatekey:
+    path: "{{ private_key_path }}"
+
+- name: Handling first init variable propagation
+  set_fact:
+    origin_subject_alt_name:
+      - "DNS:*.{{ public_domain }}"
+      - "DNS:{{ public_domain }}"
+      - "DNS:*.service.{{ consul_domain }}"
+      - "DNS:*.zsmartex.{{ consul_domain }}"
+      - "DNS:{{ inventory_hostname | regex_replace('_', '-') }}.{{ public_domain }}"
+      - "DNS:{{ inventory_hostname | regex_replace('_', '-') }}"
+      - "DNS:localhost"
+      - "IP:127.0.0.1"
+
+- name: Create certificate signing request (CSR) for CA certificate
+  community.crypto.openssl_csr_pipe:
+    privatekey_path: "{{ private_key_path }}"
+    common_name: "{{ ca_common_name }}"
+    country_name: "VN"
+    organization_name: "ZSmartex"
+    organizational_unit_name: "zsmartex.com"
+    locality_name: "HaiPhong City"
+    email_address: "huuhadz2k@gmail.com"
+    subject_alt_name: "{{ origin_subject_alt_name + subject_alt_name }}"
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    extended_key_usage:
+      - serverAuth
+      - clientAuth
+  register: self_csr
+
+- name: Generate an OpenSSL certificate signed with your own CA certificate
+  community.crypto.x509_certificate:
+    path: "{{ certificate_path }}"
+    csr_content: "{{ self_csr.csr }}"
+    ownca_path: "{{ ca_certificate_path }}"
+    ownca_privatekey_path: "{{ ca_private_key_path }}"
+    ownca_not_after: +365d  # valid for one year
+    ownca_not_before: "-1d"  # valid since yesterday
+    provider: ownca
+
+- name: Create a fullchain version
+  copy:
+    dest: "{{ fullchain_certificate_path }}"
+    content: |-
+      {{ lookup('file', certificate_path) }}
+      {{ lookup('file', ca_certificate_path) }}
+    mode: 0600
+
+- name: Create pkcs12 version
+  community.crypto.openssl_pkcs12:
+    friendly_name: "ZSmartex {{ certificate_name }}_{{ bare_name }}"
+    path: "{{ pkcs12_path }}"
+    certificate_path: "{{ certificate_path }}"
+    privatekey_path: "{{ private_key_path }}"
+    other_certificates: "{{ ca_certificate_path }}"
+    passphrase: "{{ pkcs12_passphrase }}"

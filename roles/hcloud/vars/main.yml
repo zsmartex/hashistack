@@ -1,0 +1,9 @@
+---
+__block_marker: >-
+  # {mark}-hs-{{ role_name }}-{{ workspace }}
+
+__terraform_module_working_dir: >-
+  {{ terraform_module_work_dir }}/hcloud
+
+__state: >-
+  {{ (tf_action == 'destroy') | ternary('absent', 'present') }}

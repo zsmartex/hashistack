@@ -1,0 +1,11 @@
+---
+#
+# ```{include} ../../../roles/stage1_certs/README.md
+# ```
+#
+# ## Role defaults
+#
+
+certificate_bares: ["server"]
+
+subject_alt_name: []

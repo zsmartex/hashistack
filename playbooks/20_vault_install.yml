@@ -1,0 +1,35 @@
+---
+- name: Stage 2 - Install vault
+  hosts: vault_servers
+  become: true
+  gather_facts: true
+  pre_tasks:
+    - name: Add group vault
+      group:
+        name: "vault"
+    - name: Add vault user
+      user:
+        name: "vault"
+        group: "vault"
+    - name: Creates data dir
+      file:
+        path: '{{ item["mount_path"] }}/{{ item["name"] }}'
+        state: directory
+        owner: "{{ item['owner'] }}"
+        group: "{{ item['group'] }}"
+        mode: 0755
+      loop: "{{ volumes }}"
+    - name: Links data dir
+      file:
+        src: '{{ item["mount_path"] }}/{{ item["name"] }}'
+        dest: "{{ item['path'] }}"
+        state: link
+        owner: "{{ item['owner'] }}"
+        group: "{{ item['group'] }}"
+      loop: "{{ volumes }}"
+  roles:
+    - role: vault
+      vault_internal_ip: "{{ private_ip }}"
+      vault_external_ip: "{{ public_ip }}"
+      vault_api_address: "0.0.0.0"
+      public_domain: "{{ cluster_config.ingress.public_domain }}"

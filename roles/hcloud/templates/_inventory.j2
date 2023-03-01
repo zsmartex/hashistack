@@ -1,0 +1,51 @@
+[hashistack:children]
+hashistack_sre
+hashistack_cluster
+
+[hashistack_cluster:children]
+consul_servers
+nomad_servers
+vault_servers
+client_servers
+observability_servers
+
+[hashistack_sre:children]
+sre_server
+
+[consul_server_instances:children]
+consul_servers
+nomad_servers
+
+[consul_client_instances:children]
+vault_servers
+client_servers
+observability_servers
+
+[sre_server]
+{{ sre_server.host_name }} public_ip={{ sre_server.host }} private_ip={{ sre_server.private_ip }}
+
+[consul_servers]
+{% for server in consul_servers %}
+{{ server.host_name }} public_ip={{ server.host }} private_ip={{ server.private_ip }} consul_node_role=server consul_bootstrap_expect=true volumes='{{ server.volumes | to_json }}'
+{% endfor %}
+
+[nomad_servers]
+{% for server in nomad_servers %}
+{{ server.host_name }} public_ip={{ server.host }} private_ip={{ server.private_ip }} consul_node_role=server consul_bootstrap_expect=true volumes='{{ server.volumes | to_json }}'
+{% endfor %}
+
+[vault_servers]
+{% for server in vault_servers %}
+{{ server.host_name }} public_ip={{ server.host }} private_ip={{ server.private_ip }} consul_node_role=client volumes='{{ server.volumes | to_json }}'
+{% endfor %}
+
+[client_servers]
+{% for server in client_servers %}
+{{ server.host_name }} public_ip={{ server.host }} private_ip={{ server.private_ip }} consul_node_role=client volumes='{{ server.volumes | to_json }}'
+{% endfor %}
+
+[observability_servers]
+{% for server in observability_servers %}
+{{ server.host_name }} public_ip={{ server.host }} private_ip={{ server.private_ip }} consul_node_role=client volumes='[]'
+
+{% endfor %}

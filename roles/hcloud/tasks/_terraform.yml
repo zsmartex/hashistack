@@ -1,0 +1,42 @@
+---
+- name: "Check for terraform module dir"
+  stat:
+    path: "{{ __terraform_module_working_dir }}"
+  register: _tf_module
+  tags:
+    - tf
+
+- name: "Do Terraform {{ tf_action }}"
+  community.general.terraform:
+    workspace: "{{ workspace_name }}"
+    project_path: "{{ __terraform_module_working_dir }}"
+    state: "{{ __state }}"
+    force_init: true
+    provider_upgrade: true
+    complex_vars: true
+    variables:
+      hcloud_token: "{{ hcloud_token }}"
+      ssh_public_key_file: "{{ private_key_file }}.pub"
+      separate_consul_servers: "{{ separate_consul_servers }}"
+      server_count: "{{ server_count }}"
+      vault_count: "{{ vault_count }}"
+      client_count: "{{ client_count }}"
+      multi_instance_observability: "{{ multi_instance_observability }}"
+      server_location: "{{ server_location }}"
+      load_balancer_location: "{{ load_balancer_location }}"
+      network_location: "{{ network_location }}"
+      server_instance_type: "{{ server_instance_type }}"
+      client_instance_type: "{{ client_instance_type }}"
+      observability_instance_type: "{{ observability_instance_type }}"
+      load_balancer_type: "{{ load_balancer_type }}"
+      vault_volume_size: "{{ vault_volume_size }}"
+      consul_volume_size: "{{ consul_volume_size }}"
+      client_volumes: "{{ client_volumes }}"
+      base_server_name: "{{ base_server_name }}"
+      network_name: "{{ network_name }}"
+      firewall_name: "{{ firewall_name }}"
+  register: tf_result
+  when: _tf_module.stat.exists
+  tags:
+    - tf
+    - molecule-notest

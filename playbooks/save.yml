@@ -1,0 +1,55 @@
+---
+- name: Stage 2 - Install vault
+  hosts: vault_servers
+  become: true
+  gather_facts: true
+  pre_tasks:
+    - name: Add group vault
+      group:
+        name: "vault"
+    - name: Add vault user
+      user:
+        name: "vault"
+        group: "vault"
+    - name: Creates data dir
+      file:
+        path: '{{ item["mount_path"] }}/{{ item["name"] }}'
+        state: directory
+        owner: "{{ item['owner'] }}"
+        group: "{{ item['group'] }}"
+        mode: 0755
+      loop: "{{ volumes }}"
+    - name: Links data dir
+      file:
+        src: '{{ item["mount_path"] }}/{{ item["name"] }}'
+        dest: "{{ item['path'] }}"
+        state: link
+        owner: "{{ item['owner'] }}"
+        group: "{{ item['group'] }}"
+      loop: "{{ volumes }}"
+  vars:
+    vault_version: "1.12.3"
+    vault_user: vault
+    vault_group: vault
+    vault_raft_group_name: vault_servers
+    vault_cluster_name: "vault-{{ inventory_hostname }}"
+    vault_datacenter: zsmartex
+    vault_backend: raft
+    vault_tls_disable: 0
+    vault_tls_ca_file: vault-ca.pem
+    vault_tls_src_files: "{{ workspace_secrets_dir }}/vault"
+    vault_tls_certs_path: /etc/vault.d/ssl
+    vault_tls_private_path: "{{ vault_backend_tls_certs_path }}"
+    vault_tls_client_ca_file: vault-ca.pem
+    vault_tls_cert_file: server-fullchain.pem
+    vault_tls_key_file: server-key.pem
+    vault_data_path: /opt/vault
+    vault_address: "{{ private_ip }}"
+    vault_cluster_address: "{{ private_ip }}:{{ (vault_port | int) + 1 }}"
+    vault_api_addr: "{{ vault_protocol }}://{{ vault_address }}:{{ vault_port }}"
+    vault_log_level: info
+  roles:
+    - role: ansible-vault
+    - role: robertdebock.vault_initialize
+      vault_initialize_addr: "{{ vault_protocol }}://{{ private_ip }}:{{ vault_port }}"
+      vault_initialize_show_information: yes

@@ -1,0 +1,19 @@
+---
+- name: Create certificate folder
+  file:
+    path: "{{ workspace_secrets_dir }}/{{ certificate_name }}"
+    state: directory
+    mode: 0755
+
+- name: Create CA
+  include_tasks: _create_ca.yml
+  tags:
+    - create_ca
+
+- name: Create bare certificate
+  include_tasks: _create_certificate.yml
+  with_items: "{{ certificate_bares }}"
+  loop_control:
+    loop_var: bare_name
+  tags:
+    - create_certificate

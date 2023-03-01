@@ -1,0 +1,15 @@
+---
+- name: Stage 1 - Getting system ready - system basics
+  hosts: "hashistack"
+  become: true
+  gather_facts: true
+  vars:
+    system_base_primary_locale: 'en_US.UTF-8'
+    system_base_language: 'en'
+    clan_host_caretaker_name: hashistack
+    clan_host_caretaker_default_private_key_file: "{{ workspace_ssh_private_key_file }}"
+    clan_host_caretaker_password_file: "{{ workspace_secrets_dir }}/hashistack.password"
+  roles:
+    - "rtnp.galaxie_clans.clan_host"
+    - "rtnp.galaxie_clans.system_base"
+    - "bootstrap"

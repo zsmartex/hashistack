@@ -1,0 +1,37 @@
+---
+- name: Stage 1 - Create certificate
+  hosts: localhost
+  become: false
+  gather_facts: false
+  tasks:
+    - name: Create certificate
+      include_role:
+        name: certificate
+      vars:
+        certificate_name: "{{ item.certificate_name }}"
+        consul_domain: "{{ item.consul_domain }}"
+        public_domain: "{{ item.public_domain }}"
+        certificate_bares: "{{ item.certificate_bares }}"
+        subject_alt_name: >-
+          {{
+            groups['hashistack']
+            | map ('extract', hostvars, 'private_ip')
+            | map('regex_replace', '^(.*)^', 'IP:')
+            | list
+            | unique
+            +
+            groups['hashistack']
+            | map ('extract', hostvars, 'public_ip')
+            | map('regex_replace', '^(.*)^', 'IP:')
+            | list
+            | unique
+          }}
+      loop:
+        - certificate_name: consul
+          consul_domain: consul
+          public_domain: "{{ cluster_config.ingress.public_domain }}"
+          certificate_bares: ["server", "client"]
+        - certificate_name: vault
+          consul_domain: vault
+          public_domain: "{{ cluster_config.ingress.public_domain }}"
+          certificate_bares: ["server", "client"]
