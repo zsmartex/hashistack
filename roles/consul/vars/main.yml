@@ -1,56 +1,63 @@
 ---
-__consul_vars_precedence:
-  - "{{ ansible_distribution | lower }}_{{ ansible_distribution_major_version }}_{{ ansible_architecture | lower }}.yml"
-  - "{{ ansible_distribution | lower }}_{{ ansible_architecture | lower }}.yml"
-  - "{{ ansible_distribution | lower }}_{{ ansible_distribution_major_version }}.yml"
-  - "{{ ansible_distribution | lower }}.yml"
-  - "{{ ansible_os_family | lower }}.yml"
-
-__consul_tasks_precedence:
-  - "{{ ansible_distribution | lower }}_{{ ansible_distribution_major_version }}_{{ ansible_architecture | lower }}/main.yml"
-  - "{{ ansible_distribution | lower }}_{{ ansible_architecture | lower }}/main.yml"
-  - "{{ ansible_distribution | lower }}_{{ ansible_distribution_major_version }}/main.yml"
-  - "{{ ansible_distribution | lower }}/main.yml"
-
-__consul_is_server: >-
-  {{
-    consul_server_group is defined
-    and consul_server_group | length > 0
-    and inventory_hostname in groups[consul_server_group]
-  }}
-
-__consul_is_minion: "{{ not __consul_is_server }}"
-
-__consul_tls_dir: "/etc/ssl/private"
+__consul_hashicorp_apt_key: >-
+  https://apt.releases.hashicorp.com/gpg
+__consul_hashicorp_apt_repository: >-
+  deb [arch=amd64] https://apt.releases.hashicorp.com bullseye main
 
 __consul_ssl_cert_group: "ssl-cert"
 
-__consul_conf_file: "/etc/consul.d/consul.hcl"
-__consul_data_dir: "/opt/consul/data"
+__consul_tls_ca_certificate_dir: "/usr/local/share/ca-certificates"
+__consul_tls_dir: "{{ consul_config_path }}/ssl"
+
+__consul_conf_file: "{{ consul_config_path }}/consul.hcl"
+
 __consul_expected_directories:
-  - "{{ __consul_data_dir }}"
+  - "{{ consul_data_path }}"
+  - "{{ consul_config_path }}"
+  - "{{ __consul_tls_dir }}"
 
-__consul_home: "/home/consul"
+__consul_bootstrap_list: >-
+  {{
+    groups[consul_bootstrap_group_name]
+    | map('extract', hostvars, 'private_ip')
+    | list
+    | unique
+  }}
 
-__consul_self_private_key: "{{ __consul_tls_dir }}/self.cert.key"
-__consul_self_certificate: "{{ __consul_tls_dir }}/self.fullchain.cert.pem"
-__consul_ca_certificate_dir: "/usr/local/share/ca-certificates"
-__consul_ca_certificate: "{{ __consul_ca_certificate_dir }}/consul.ca.crt"
-__consul_vault_root_ca_certificate: "{{ __consul_ca_certificate_dir }}/vault.root_ca.crt"
+__consul_server_list: >-
+  {{
+    groups[consul_server_group_name]
+    | map('extract', hostvars, 'private_ip')
+    | list
+    | unique
+  }}
+
+__consul_is_bootstrap: >-
+  {{
+    consul_bootstrap_group_name is defined
+    and consul_bootstrap_group_name | length > 0
+    and inventory_hostname in groups[consul_bootstrap_group_name]
+  }}
+
+__consul_is_server: >-
+  {{
+    __consul_is_bootstrap
+    or consul_server_group_name is defined
+    and consul_server_group_name | length > 0
+    and inventory_hostname in groups[consul_server_group_name]
+  }}
+
+__consul_is_client: "{{ not __consul_is_server }}"
 
 __consul_encrypt_key_local_path: "{{ consul_local_secrets_dir }}/consul.encrypt_key"
 __consul_encrypt_key: >-
   {{ lookup('file', __consul_encrypt_key_local_path) }}
 
-__consul_acl_auto_encrypt_token_path: "{{ consul_local_secrets_dir }}/consul.acl_token"
+__consul_tls_ca_crt: "certificate-authority.pem"
+__consul_tls_server_crt: "server-fullchain.pem"
+__consul_tls_server_key: "server-key.pem"
 
-__consul_acl_bootstrapped: false
-
-__consul_server_partners: >-
-  {{
-    groups[consul_server_group]
-    | difference([inventory_hostname])
-    | map('regex_replace', '_', '-')
-    | map('regex_replace', '$', '.' + consul_domain)
-  }}
-
+__consul_terraform_module: >-
+  consul_config
+__consul_terraform_module_work_dir: >-
+  {{ consul_terraform_work_dir }}/{{ __consul_terraform_module }}

@@ -22,6 +22,7 @@
 - name: APPLY - Terraform output extract
   set_fact:
     sre_server: "{{ tf_result.outputs.sre_server.value }}"
+    bootstrap_servers: "{{ tf_result.outputs.bootstrap_servers.value }}"
     consul_servers: "{{ tf_result.outputs.consul_servers.value }}"
     nomad_servers: "{{ tf_result.outputs.nomad_servers.value }}"
     vault_servers: "{{ tf_result.outputs.vault_servers.value }}"

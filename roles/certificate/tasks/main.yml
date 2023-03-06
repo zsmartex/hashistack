@@ -1,10 +1,4 @@
 ---
-- name: Create certificate folder
-  file:
-    path: "{{ workspace_secrets_dir }}/{{ certificate_name }}"
-    state: directory
-    mode: 0755
-
 - name: Create CA
   include_tasks: _create_ca.yml
   tags:

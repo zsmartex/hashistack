@@ -30,27 +30,14 @@
   tags:
     - configure
 
-- name: Upload Vault Root CA
-  copy:
-    dest: "{{ __consul_vault_root_ca_certificate }}"
-    content: |-
-      {{ pki_root_certificate_b64 | b64decode }}
-    mode: 0644
-    owner: root
-    group: "{{ __consul_ssl_cert_group }}"
-  notify: Update ca trust
-  tags:
-    - configure
-
 - name: Upload CA certificate
   copy:
-    src: "{{ consul_local_ca_cert }}"
-    dest: "{{ __consul_ca_certificate }}"
+    src: "{{ consul_local_ca_certificate }}"
+    dest: "{{ __consul_tls_ca_certificate_dir }}/{{ __consul_tls_ca_crt }}"
     owner: root
     group: "{{ __consul_ssl_cert_group }}"
     mode: 0644
   notify: Update ca trust
-  when: consul_use_custom_ca
   tags:
     - configure
 
@@ -59,7 +46,7 @@
   tags:
     - configure
 
-- name: Upload self certificate
+- name: Upload consul certificate
   copy:
     src: "{{ _current_cert_part }}"
     dest: "{{ __consul_tls_dir }}/{{ _current_cert_part.split('/')[-1] }}"
@@ -67,13 +54,22 @@
     group: "{{ __consul_ssl_cert_group }}"
     mode: 0640
   loop:
-    - "{{ consul_node_cert }}"
-    - "{{ consul_node_cert_private_key }}"
-    - "{{ consul_node_cert_fullchain }}"
+    - "{{ consul_local_cert_fullchain }}"
+    - "{{ consul_local_cert_private_key }}"
   loop_control:
     loop_var: _current_cert_part
   notify: Restart consul
-  when: __consul_is_server
+  tags:
+    - configure
+
+- name: Write consul server configuration
+  template:
+    src: "consul.hcl.j2"
+    dest: "{{ __consul_conf_file }}"
+    owner: consul
+    group: consul
+    mode: 0640
+  notify: Restart consul
   tags:
     - configure
 
@@ -90,17 +86,6 @@
   become: false
   delegate_to: localhost
   no_log: true
-  tags:
-    - configure
-
-- name: Write consul server configuration
-  template:
-    src: "consul.hcl.j2"
-    dest: "{{ __consul_conf_file }}"
-    owner: consul
-    group: consul
-    mode: 0640
-  notify: Restart consul
   tags:
     - configure
 

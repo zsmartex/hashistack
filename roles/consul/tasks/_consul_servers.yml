@@ -15,8 +15,7 @@
         name = "vault"
         port = 8200
         token = "{{ consul_acl_vault_token }}"
-        address = "{{ inventory_hostname }}.{{ public_domain }}"
-        connect { 
+        connect {
           sidecar_service {
             proxy = {
               destination_service_name = "vault"
@@ -32,7 +31,7 @@
       }
   notify: Reload consul
 
-- name: force running of all notified handlers now
+- name: Force running of all notified handlers now
   meta: flush_handlers
 
 - name: Wait for consul api
@@ -49,8 +48,8 @@
     mode: 0640
     content: |-
       CONSUL_HTTP_TOKEN="{{ consul_acl_vault_token }}"
-      CONSUL_HTTP_ADDR="https://{{ inventory_hostname }}.{{ public_domain }}:8501"
-      CONSUL_GRPC_ADDR="{{ inventory_hostname }}.{{ public_domain }}:8503"
+      CONSUL_HTTP_ADDR="https://{{ private_ip }}:8501"
+      CONSUL_GRPC_ADDR="{{ private_ip }}:8503"
       CONSUL_HTTP_SSL=true
   notify: Restart sidecarvault
 

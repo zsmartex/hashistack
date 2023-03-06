@@ -24,6 +24,10 @@ variable "client_count" {
   type =  number
 }
 
+variable "bootstrap_count" {
+  type = number
+}
+
 variable "multi_instance_observability" {
   type = bool
 }

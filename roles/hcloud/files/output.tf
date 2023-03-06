@@ -11,6 +11,19 @@ output "sre_server" {
   ]))
 }
 
+output "bootstrap_servers" {
+  value = flatten([
+    for index, node in hcloud_server.server_node : [
+      for server in local.servers :
+      {host = "${node.ipv4_address}", 
+        host_name = "${node.name}", 
+        private_ip = "${server.private_ip}",
+        server_id= node.id
+      } if server.name == node.name
+    ] if node.labels["group"] == "bootstrap"
+  ])
+}
+
 output "consul_servers" {
   value = flatten([
     for index, node in hcloud_server.server_node : [

@@ -45,9 +45,9 @@
     group: "{{ __vault_ssl_cert_group }}"
     mode: 0640
   loop:
-    - "{{ vault_node_cert }}"
-    - "{{ vault_node_cert_private_key }}"
-    - "{{ vault_node_cert_fullchain }}"
+    - "{{ vault_local_cert }}"
+    - "{{ vault_local_cert_private_key }}"
+    - "{{ vault_local_cert_fullchain }}"
   loop_control:
     loop_var: _current_cert_part
   notify: Restart vault

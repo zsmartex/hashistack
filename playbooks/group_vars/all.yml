@@ -1,13 +1,14 @@
 ---
+workspace: hashistack
 collection_root: "{{ (playbook_dir) | realpath }}"
 collection_tf_modules_dir: "{{ collection_root }}/terraform"
 
-tf_action: apply # apply or destroy
+tf_action: destroy # apply or destroy
 
 workspace_name: "Hashistack"
 workspace_root: "{{ lookup('env', 'PWD') }}"
 workspace_host_vars_dir: "{{ workspace_root }}/host_vars"
-workspace_group_vars_dir: "{{ workspace_root }}/group_vars"
+workspace_group_vars_dir: "{{ workspace_root }}/group_vars/hashistack"
 workspace_group_vars_dir_relative_dir: "./group_vars/hashistack"
 workspace_tf_modules_dir: "{{ workspace_host_vars_dir }}/terraform"
 workspace_secrets_dir: "{{ workspace_group_vars_dir }}/secrets"
@@ -20,3 +21,39 @@ host_secrets_dir: "{{ host_vars_dir }}/secrets"
 
 tf_module_src: "{{ collection_tf_modules_dir }}/{{ tf_module_name }}/"
 tf_module_dest: "{{ workspace_tf_modules_dir }}/{{ tf_module_name }}"
+
+cluster_config:
+  servers: 3 # min 3 suggest 5
+  clients: 2
+  bootstrap_servers: 1 # minimum 1
+  vault_servers: 1
+  vault_volume_size: 10
+  consul_volume_size: 10
+  separate_consul_servers: false
+  multi_instance_observability: false
+  ingress:
+    management_domain: management.zsmartex.com
+    public_domain: zsmartex.com
+  client_volumes:
+  - name: "data_vol"
+    client_id: 1
+    path: /opt/nomad_client_data
+    size: 20
+
+cloud_provider_config:
+  internal_network_interface_name: enp7s0 #ens10
+  sudo_user: root
+  sudo_dir: /root
+  provider: hetzner
+  provider_settings:
+    server_location: fsn1
+    load_balancer_location: fsn1
+    network_location: eu-central
+    server_instance_type: cpx11
+    client_instance_type: cpx21
+    observability_instance_type: cpx11
+    load_balancer_type: lb11
+    resource_names:
+      base_server_name: hashistack
+      firewall_name: hs_firewall
+      network_name: hs_network

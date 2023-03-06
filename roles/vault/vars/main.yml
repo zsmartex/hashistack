@@ -48,8 +48,9 @@ __vault_server_partners: >-
   {{
     groups[vault_servers_group]
     | difference([inventory_hostname])
-    | map('regex_replace', '_', '-')
-    | map('regex_replace', '$', '.' + vault_domain)
+    | map('extract', hostvars, 'private_ip')
+    | list
+    | unique
   }}
 
 __vault_terraform_module: >-

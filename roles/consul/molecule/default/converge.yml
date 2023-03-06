@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include template_role_ansible"
+      include_role:
+        name: "template-role-ansible"

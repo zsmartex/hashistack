@@ -1,12 +1,12 @@
 ---
-ca_certificate_path: "{{ workspace_secrets_dir }}/{{ certificate_name }}/{{ certificate_name }}-ca.pem"
-ca_private_key_path: "{{ workspace_secrets_dir }}/{{ certificate_name }}/{{ certificate_name }}-ca-key.pem"
+ca_certificate_path: "{{ workspace_secrets_dir }}/certificate-authority.pem"
+ca_private_key_path: "{{ workspace_secrets_dir }}/certificate-authority-key.pem"
 
 ca_common_name: "ZSmartex Cryptocurrency Exchange CA"
 
-certificate_path: "{{ workspace_secrets_dir }}/{{ certificate_name }}/{{ bare_name }}.pem"
-private_key_path: "{{ workspace_secrets_dir }}/{{ certificate_name }}/{{ bare_name }}-key.pem"
-fullchain_certificate_path: "{{ workspace_secrets_dir }}/{{ certificate_name }}/{{ bare_name }}-fullchain.pem"
+certificate_path: "{{ workspace_secrets_dir }}/{{ bare_name }}.pem"
+private_key_path: "{{ workspace_secrets_dir }}/{{ bare_name }}-key.pem"
+fullchain_certificate_path: "{{ workspace_secrets_dir }}/{{ bare_name }}-fullchain.pem"
 
-pkcs12_path: "{{ workspace_secrets_dir }}/{{ certificate_name }}/{{ bare_name }}.p12"
-pkcs12_passphrase: "{{ lookup('password', workspace_secrets_dir + '/' + certificate_name + '/' + bare_name + '_pkcs12.passphrase length=42') }}"
+pkcs12_path: "{{ workspace_secrets_dir }}/{{ bare_name }}.p12"
+pkcs12_passphrase: "{{ lookup('password', workspace_secrets_dir + '/' + bare_name + '_pkcs12.passphrase length=42') }}"

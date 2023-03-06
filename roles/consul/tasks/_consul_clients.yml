@@ -1,0 +1,42 @@
+---
+- name: Load group vars
+  include_vars:
+    dir: "{{ workspace_group_vars_dir }}"
+    ignore_unknown_extensions: true
+
+- name: Render system service env file
+  copy:
+    dest: "/etc/consul.d/ingress-gateway-client2vault.env"
+    owner: consul
+    group: consul
+    mode: 0640
+    content: |-
+      CONSUL_HTTP_TOKEN="{{ consul_nomad2vault_token }}"
+      CONSUL_HTTP_ADDR="https://{{ private_ip }}:{{ consul_api_port }}"
+      CONSUL_HTTP_SSL="true"
+      CONSUL_HTTP_SSL_VERIFY="false"
+      CONSUL_CACERT="{{ __consul_tls_ca_certificate_dir }}/{{ __consul_tls_ca_crt }}"
+      CONSUL_CLIENT_CERT="{{ __consul_tls_dir }}/{{ __consul_tls_server_crt }}"
+      CONSUL_CLIENT_KEY="{{ __consul_tls_dir }}/{{ __consul_tls_server_key }}"
+  notify: Restart client2vault
+
+- name: Render envoy systemd service
+  copy:
+    dest: "/lib/systemd/system/client2vault.service"
+    owner: consul
+    group: consul
+    mode: 0640
+    content: |-
+      [Unit]
+      Description=Consul ingress gateway for vault
+      Requires=network-online.target
+      After=network-online.target
+
+      [Service]
+      Restart=always
+      EnvironmentFile=/etc/consul.d/ingress-gateway-client2vault.env
+      ExecStart=/usr/bin/consul connect envoy -register -gateway=ingress -service=client2vault
+
+      [Install]
+      WantedBy=multi-user.target
+  notify: Restart client2vault

@@ -19,12 +19,6 @@
       loop_control:
         loop_var: _current_dir
 
-    - name: Create global variables
-      copy:
-        src: group_vars/all.yml
-        dest: "{{ base_dir }}/{{ dir_name }}/group_vars/all.yml"
-        mode: 0640
-
     - name: Create inventory files
       copy:
         dest: "{{ base_dir }}/{{ dir_name }}/inventory"
@@ -36,6 +30,8 @@
           # Playbooks rely on predefined groups hierarchy:
           #
           # _ hashistack
+          #   \_ hashistack_sre
+          #   \_ hashistack_cluster
           #   \_ consul_servers
           #   \_ nomad_servers
           #   \_ vault_servers
@@ -53,12 +49,6 @@
           #
           # SSH configuration for Hashistack instance: {{ workspace }}
           #
-
-    - name: Create instance-local ansible configuration
-      copy:
-        src: ../config.yml
-        dest: "{{ base_dir }}/{{ dir_name }}/config.yml"
-        mode: 0640
 
     - name: Create instance-local ansible configuration
       copy:

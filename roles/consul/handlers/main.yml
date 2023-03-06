@@ -22,9 +22,9 @@
     state: reloaded
     enabled: true
 
-- name: Restart minion2vault
+- name: Restart client2vault
   systemd:
-    name: minion2vault
+    name: client2vault
     state: restarted
     daemon_reload: true
     enabled: true

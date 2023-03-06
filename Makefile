@@ -49,34 +49,34 @@ prepare: venv-check ### Install workspace env dependencies
 ## ——————————————————————————————— STAGE_0 - INIT ———————————————————————————————
 ##
 init_instance: ## Init inventory dir for instance
-	ansible-playbook playbooks/00_init_instance.yml -e @config.yml
+	ansible-playbook playbooks/00_init_instance.yml
 
 ##
 ## —————————————————————————— STAGE_0 - INFRASTRUCTURE ——————————————————————————
 ##
 .PHONY: stage_1_hcloud
 stage_0_hcloud: ### Create infra and generate inventory
-	ansible-playbook ../../playbooks/01_infra_hcloud.yml -e @config.yml
+	ansible-playbook ../../playbooks/01_infra_hcloud.yml
 
 ##
 ## —————————————————————————————— STAGE_1 - SYSTEMS —————————————————————————————
 ##
 .PHONY: stage_1_bootstrap
 stage_1_bootstrap: ### Create infra and generate inventory
-	ansible-playbook ../../playbooks/10_core_bootstrap.yml -e @config.yml
+	ansible-playbook ../../playbooks/10_core_bootstrap.yml
 
 stage_1_certificate:
-	ansible-playbook ../../playbooks/11_create_certificate.yml -e @config.yml
+	ansible-playbook ../../playbooks/11_create_certificate.yml
 
 stage_1: stage_1_bootstrap stage_1_certificate
 ##
 ## ——————————————————————————— STAGE_2 - VAULT+CONSUL ———————————————————————————
 ##
 stage_2_vault:
-	ansible-playbook ../../playbooks/20_vault_install.yml -e @config.yml
+	ansible-playbook ../../playbooks/20_vault_install.yml
 
 stage_2_consul:
-	ansible-playbook ../../playbooks/21_consul_install.yml -e @config.yml
+	ansible-playbook ../../playbooks/21_consul_install.yml
 
 stage_2: stage_2_vault # stage_2_consul
 

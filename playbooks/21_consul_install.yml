@@ -3,39 +3,29 @@
   hosts: hashistack_cluster
   become: true
   gather_facts: true
-  tasks:
-    - name: Creates config dir
+  pre_tasks:
+    - name: Add consul group
+      group:
+        name: "consul"
+    - name: Add consul user
+      user:
+        name: "consul"
+        group: "consul"
+    - name: Creates data dir
       file:
-        path: /etc/consul.d
+        path: '{{ item["mount_path"] }}/{{ item["name"] }}'
         state: directory
-        owner: consul
-        group: consul
+        owner: "{{ item['owner'] }}"
+        group: "{{ item['group'] }}"
         mode: 0755
-    - name: Creates ssl dir
+      loop: "{{ volumes }}"
+    - name: Links data dir
       file:
-        path: /etc/consul.d/ssl
-        state: directory
-        owner: consul
-        group: consul
-        mode: 0755
-    - name: Copy consul server certificates
-      copy:
-        src: "{{ workspace_secrets_dir }}/consul/{{ item }}"
-        dest: /etc/consul.d/ssl/{{ item }}
-        owner: consul
-        group: consul
-        mode: 0755
-      with_items:
-        - consul-ca.pem
-        - consul-ca-key.pem
-        - server.pem
-        - server-key.pem
-        - server-fullchain.pem
-
-- name: Stage 2 - Setup bootstrap consul
-  hosts: hashistack_cluster
-  become: true
-  gather_facts: true
+        src: '{{ item["mount_path"] }}/{{ item["name"] }}'
+        dest: "{{ item['path'] }}"
+        state: link
+        owner: "{{ item['owner'] }}"
+        group: "{{ item['group'] }}"
+      loop: "{{ volumes }}"
   roles:
     - role: consul
-    - role: envoy

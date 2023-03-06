@@ -12,10 +12,10 @@
     url: "{{ consul_external_url }}/v1/agent/members"
     headers:
       X-Consul-Token: "{{ root_consul.SecretID }}"
-    ca_path: "{{ consul_use_custom_ca | ternary(local_ca_certificate, '') | default(omit, true) }}"
+    ca_path: "{{ consul_local_ca_certificate }}"
   register: _consul_ping_api
   until: _consul_ping_api.status == 200
-  retries: 30
+  retries: 2
   delay: 10
   delegate_to: localhost
   become: false
@@ -23,8 +23,8 @@
 
 - name: "Copy terraform sources"
   copy:
-    src: "{{ tf_module_src }}"
-    dest: "{{ tf_module_dest }}"
+    src: "{{ __consul_terraform_module }}/"
+    dest: "{{ __consul_terraform_module_work_dir }}/"
     mode: "u+rwX,g+rX,o-rX"
   delegate_to: localhost
   become: false
@@ -41,7 +41,7 @@
       consul_address: "{{ consul_external_url }}"
       datacenter: "{{ workspace }}"
       token: "{{ root_consul.SecretID }}"
-      ca_file: "{{ consul_use_custom_ca | ternary(local_ca_certificate, '') | default(omit, true) }}"
+      ca_file: "{{ consul_local_ca_certificate }}"
   register: tf_result
   delegate_to: localhost
   become: false
@@ -58,7 +58,7 @@
         consul_prometheus_token: "{{ tf_result.outputs.consul_acl_prometheus_token.value }}"
         consul_telemetry_token: "{{ tf_result.outputs.consul_acl_telemetry_token.value }}"
         consul_promtail_token: "{{ tf_result.outputs.consul_acl_promtail_token.value }}"
-        consul_acl_auto_encrypt_token: "{{ tf_result.outputs.consul_acl_minion_token.value }}"
+        consul_acl_auto_encrypt_token: "{{ tf_result.outputs.consul_acl_client_token.value }}"
         consul_nomad2vault_token: "{{ tf_result.outputs.consul_nomad2vault_token.value }}"
         consul_acl_vault_token: "{{ tf_result.outputs.consul_acl_vault_token.value }}"
   delegate_to: localhost

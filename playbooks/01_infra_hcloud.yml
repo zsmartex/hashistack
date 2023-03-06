@@ -12,6 +12,7 @@
     server_count: "{{ cluster_config.servers }}"
     vault_count: "{{ cluster_config.vault_servers }}"
     client_count: "{{ cluster_config.clients }}"
+    bootstrap_count: "{{ cluster_config.bootstrap_servers }}"
     multi_instance_observability: "{{ cluster_config.multi_instance_observability }}"
     server_location: "{{ cloud_provider_config.provider_settings.server_location }}"
     load_balancer_location: "{{ cloud_provider_config.provider_settings.load_balancer_location }}"

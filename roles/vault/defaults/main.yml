@@ -6,12 +6,11 @@
 # ## Defaults
 #
 # * Domain under which
-vault_domain: "{{ public_domain }}"
 vault_cluster_name: "{{ workspace }}"
 #
 #
-# * Path on the ansible controller  
-vault_local_secret_dir: "{{ workspace_secrets_dir }}/vault"
+# * Path on the ansible controller
+vault_local_secret_dir: "{{ workspace_secrets_dir }}"
 
 vault_node_name: "{{ inventory_hostname | regex_replace('_', '-') }}"
 
@@ -29,20 +28,26 @@ vault_cluster_address: "{{ vault_internal_ip }}"
 vault_cluster_port: "8201"
 vault_cluster_listener: "{{ vault_internal_ip }}:{{ vault_cluster_port }}"
 #
-# ### Certificates
-#
-vault_use_custom_ca: true
-vault_node_ca_cert: "{{ vault_local_secret_dir }}/vault-ca.pem"
-vault_node_cert: "{{ vault_local_secret_dir }}/server.pem"
-vault_node_cert_private_key: "{{ vault_local_secret_dir }}/server-key.pem"
-vault_node_cert_fullchain: "{{ vault_local_secret_dir }}/server-fullchain.pem"
-#
 # ### Unseal
 #
 vault_unseal_method: "in-place"
 vault_unseal_key_shares: 5
 vault_unseal_key_threshold: 3
-vault_local_unseal_file: "{{ vault_local_secret_dir }}/root_vault.yml"
-vault_local_ca_cert: "{{ vault_local_secret_dir }}/vault-ca.pem"
+#
 
+#
+# ### Certificates
+#
+vault_use_custom_ca: true
+vault_local_unseal_file: "{{ vault_local_secret_dir }}/root_vault.yml"
+vault_local_ca_cert: "{{ vault_local_secret_dir }}/certificate-authority.pem"
+vault_local_cert: "{{ vault_local_secret_dir }}/server.pem"
+vault_local_cert_private_key: "{{ vault_local_secret_dir }}/server-key.pem"
+vault_local_cert_fullchain: "{{ vault_local_secret_dir }}/server-fullchain.pem"
+#
+
+#
+# ### Teraform
+#
 vault_terraform_work_dir: "{{ workspace_tf_modules_dir }}"
+#

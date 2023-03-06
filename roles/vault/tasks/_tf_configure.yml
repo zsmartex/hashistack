@@ -37,7 +37,7 @@
       vault_address: >-
         {{ vault_api_protocol }}://{{ vault_external_ip }}:{{ vault_api_port }}
       vault_ca_cert_file: >-
-        {{ vault_use_custom_ca | ternary(vault_node_ca_cert, '') | default(omit, true) }}
+        {{ vault_use_custom_ca | ternary(vault_local_ca_cert, '') | default(omit, true) }}
       nomad_allowed_vault_policies: >-
         {{ nomad_allowed_vault_policies | default([], true) | to_json }}
   environment:

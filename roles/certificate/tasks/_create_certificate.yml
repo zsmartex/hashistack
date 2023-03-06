@@ -8,6 +8,8 @@
     origin_subject_alt_name:
       - "DNS:*.{{ public_domain }}"
       - "DNS:{{ public_domain }}"
+      - "DNS:*.{{ management_domain }}"
+      - "DNS:{{ management_domain }}"
       - "DNS:*.service.{{ consul_domain }}"
       - "DNS:*.zsmartex.{{ consul_domain }}"
       - "DNS:{{ inventory_hostname | regex_replace('_', '-') }}.{{ public_domain }}"
@@ -53,7 +55,7 @@
 
 - name: Create pkcs12 version
   community.crypto.openssl_pkcs12:
-    friendly_name: "ZSmartex {{ certificate_name }}_{{ bare_name }}"
+    friendly_name: "ZSmartex {{ bare_name }}"
     path: "{{ pkcs12_path }}"
     certificate_path: "{{ certificate_path }}"
     privatekey_path: "{{ private_key_path }}"

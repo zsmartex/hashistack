@@ -5,21 +5,24 @@ locals {
     sre = {
       count = "1", subnet = "0", group = 0, server_type = var.server_instance_type
     },
+    bootstrap = {
+      count = var.bootstrap_count, subnet = "1", group = 1, server_type = var.server_instance_type
+    },
     consul = {
       count = var.separate_consul_servers ? var.server_count : 0 * var.server_count,
-      subnet = "1", group = 1, server_type = var.server_instance_type
+      subnet = "2", group = 1, server_type = var.server_instance_type
     },
     nomad-server = {
-      count = var.server_count, subnet = "2", group = 1, server_type = var.server_instance_type
+      count = var.server_count, subnet = "3", group = 1, server_type = var.server_instance_type
     },
     vault = {
-      count = var.vault_count, subnet = "3", group = 1, server_type = var.server_instance_type
+      count = var.vault_count, subnet = "4", group = 1, server_type = var.server_instance_type
     },
     client = {
-      count = var.client_count, subnet = "4", group = 2, server_type = var.client_instance_type
+      count = var.client_count, subnet = "5", group = 2, server_type = var.client_instance_type
     },
     observability = {
-      count = var.multi_instance_observability ? 4 : 1, subnet = "5", group = 1, server_type = var.observability_instance_type
+      count = var.multi_instance_observability ? 4 : 1, subnet = "6", group = 1, server_type = var.observability_instance_type
     }
   }
 
@@ -175,6 +178,7 @@ resource "hcloud_server" "server_node" {
     ipv6_enabled = false
   }
   depends_on = [
+    hcloud_network_subnet.network_subnet["bootstrap"],
     hcloud_network_subnet.network_subnet["consul"],
     hcloud_network_subnet.network_subnet["nomad-server"],
     hcloud_network_subnet.network_subnet["vault"],

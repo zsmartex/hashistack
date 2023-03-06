@@ -40,7 +40,7 @@
         mode: 0600
         content: |-
           ---
-          {{ vault_init_content | to_nice_yaml }}
+          {{ {'vault_init_content': vault_init_content} | to_nice_yaml }}
       become: false
       delegate_to: localhost
 

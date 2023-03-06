@@ -21,6 +21,7 @@
       server_count: "{{ server_count }}"
       vault_count: "{{ vault_count }}"
       client_count: "{{ client_count }}"
+      bootstrap_count: "{{ bootstrap_count }}"
       multi_instance_observability: "{{ multi_instance_observability }}"
       server_location: "{{ server_location }}"
       load_balancer_location: "{{ load_balancer_location }}"

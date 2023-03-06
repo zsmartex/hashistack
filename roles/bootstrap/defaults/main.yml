@@ -1,11 +1,11 @@
 ---
 #
-# ```{include} ../../../roles/stage1_bootstrap/README.md
+# ```{include} ../../../roles/bootstrap/README.md
 # ```
 #
 # ## Role defaults
 #
-stage1_bootstrap_packages:
+bootstrap_packages:
   - apt-transport-https
   - aptitude
   - build-essential
@@ -21,3 +21,4 @@ stage1_bootstrap_packages:
   - python3-setuptools
   - python-apt-dev
   - sudo
+  - nano
