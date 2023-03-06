@@ -25,4 +25,3 @@ path "/sys/mounts/${intermediate_pki_path}" {
 path "/${intermediate_pki_path}/*" {
   capabilities = [ "create", "read", "update", "delete", "list" ]
 }
-

@@ -16,4 +16,3 @@ resource "vault_token" "connect_ca" {
   renew_min_lease = 21600
   renew_increment = 21600
 }
-

@@ -3,7 +3,7 @@ workspace: hashistack
 collection_root: "{{ (playbook_dir) | realpath }}"
 collection_tf_modules_dir: "{{ collection_root }}/terraform"
 
-tf_action: destroy # apply or destroy
+tf_action: apply # apply or destroy
 
 workspace_name: "Hashistack"
 workspace_root: "{{ lookup('env', 'PWD') }}"

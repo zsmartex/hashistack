@@ -53,9 +53,9 @@ __consul_encrypt_key_local_path: "{{ consul_local_secrets_dir }}/consul.encrypt_
 __consul_encrypt_key: >-
   {{ lookup('file', __consul_encrypt_key_local_path) }}
 
-__consul_tls_ca_crt: "certificate-authority.pem"
-__consul_tls_server_crt: "server-fullchain.pem"
-__consul_tls_server_key: "server-key.pem"
+__consul_tls_ca_crt: "certificate-authority.crt"
+__consul_tls_server_crt: "server-fullchain.crt"
+__consul_tls_server_key: "server.key"
 
 __consul_terraform_module: >-
   consul_config

@@ -12,13 +12,15 @@ bind_addr = "{{ consul_bind_address }}"
 tls = {
   defaults = {
     ca_file         = "{{ __consul_tls_ca_certificate_dir }}/{{ __consul_tls_ca_crt }}"
+{% if __consul_is_server %}
     cert_file       = "{{ __consul_tls_dir }}/{{ __consul_tls_server_crt }}"
     key_file        = "{{ __consul_tls_dir }}/{{ __consul_tls_server_key }}"
-    verify_incoming = false
-    verify_outgoing = false
+{% endif %}
+    verify_incoming = true
+    verify_outgoing = true
   }
   internal_rpc {
-    verify_server_hostname = false
+    verify_server_hostname = true
   }
   grpc {
     use_auto_cert = true
@@ -32,11 +34,9 @@ acl = {
   default_policy = "{{ consul_acl_default_policy }}"
   enable_token_persistence = {{ consul_acl_token_persistence_enabled | lower }}
 
-{% if __consul_is_client and consul_acl_auto_encrypt_token %}
   tokens {
     default = "{{ consul_acl_auto_encrypt_token }}"
   }
-{% endif %}
 }
 {% endif %}
 
@@ -58,6 +58,7 @@ auto_encrypt = {
 enable_local_script_checks = true
 {% endif %}
 
+{% if consul_connect_enabled %}
 connect {
   enabled     = true
   ca_provider = "vault"
@@ -65,6 +66,10 @@ connect {
   ca_config {
     address = "{{ consul_vault_address }}"
     token = "{{ consul_connect_token }}"
+    ca_file = "{{ __consul_tls_ca_certificate_dir }}/{{ __consul_tls_ca_crt }}"
+    cert_file = "{{ __consul_tls_dir }}/{{ __consul_tls_server_crt }}"
+    key_file = "{{ __consul_tls_dir }}/{{ __consul_tls_server_key }}"
+    insecure = true
     root_pki_path = "{{ consul_connect_root_pki_path }}"
     intermediate_pki_path = "{{ consul_connect_intermediate_pki_path }}"
     leaf_cert_ttl = "72h"
@@ -74,6 +79,7 @@ connect {
     private_key_bits = 2048
   }
 }
+{% endif %}
 
 {% if consul_ui_enabled %}
 ui_config {

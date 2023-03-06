@@ -11,6 +11,7 @@
       - "DNS:*.{{ management_domain }}"
       - "DNS:{{ management_domain }}"
       - "DNS:*.service.{{ consul_domain }}"
+      - "DNS:*.{{ workspace }}.{{ consul_domain }}"
       - "DNS:*.zsmartex.{{ consul_domain }}"
       - "DNS:{{ inventory_hostname | regex_replace('_', '-') }}.{{ public_domain }}"
       - "DNS:{{ inventory_hostname | regex_replace('_', '-') }}"

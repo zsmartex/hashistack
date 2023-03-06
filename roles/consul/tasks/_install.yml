@@ -28,5 +28,6 @@
       - "ssl-cert"
       - "consul={{ consul_version }}"
     state: present
+    force: true
   tags:
     - install
