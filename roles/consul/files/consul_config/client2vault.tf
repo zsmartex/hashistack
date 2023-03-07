@@ -76,7 +76,7 @@ resource "consul_config_entry" "vault_sidecar_proxy" {
       destination_service_name = "vault"
       local_service_port       = 8200
       local_request_timeout_ms = 0
-      local_idle_timeout_ms = 0
+      local_idle_timeout_ms    = 0
     }
   })
   depends_on = [

@@ -28,4 +28,5 @@
         group: "{{ item['group'] }}"
       loop: "{{ volumes }}"
   roles:
+    - role: envoy
     - role: consul

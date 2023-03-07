@@ -47,7 +47,7 @@
   include_tasks: _tf_configure.yml
 
 - name: Configure consul on Servers
-  include_tasks: "{{ role_path }}/tasks/_consul_servers.yml"
+  include_tasks: "{{ role_path }}/tasks/services/_consul_servers.yml"
   when: inventory_hostname in groups[consul_server_group_name]
   tags:
     - consul_servers
@@ -70,7 +70,7 @@
   when: (inventory_hostname in groups[consul_client_group_name]) or (inventory_hostname in groups['hashistack_sre'])
 
 - name: Configure consul on Clients
-  include_tasks: "{{ role_path }}/tasks/_consul_clients.yml"
+  include_tasks: "{{ role_path }}/tasks/services/_consul_clients.yml"
   when:
     - (inventory_hostname in groups[consul_client_group_name]) or (inventory_hostname in groups['hashistack_sre'])
     - (groups[consul_client_group_name] | intersect(groups['hashistack_sre']) | length) == 0

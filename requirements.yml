@@ -16,15 +16,8 @@ collections:
     version: ">=1.12.0"
   - name: rtnp.galaxie_clans
     version: ">=1.11.3"
+  - name: prometheus.prometheus
+    version: ">=0.1.4"
 
 roles:
-  - name: cloudalchemy.prometheus
   - name: robertdebock.vault_initialize
-  - src: https://github.com/ansible-community/ansible-consul.git
-    name: ansible-consul
-    scm: git
-    version: master
-  - src: https://github.com/huuhait/ansible-vault.git
-    name: ansible-vault
-    scm: git
-    version: fix-api-check
