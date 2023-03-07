@@ -9,10 +9,11 @@
     path: "{{ private_key_file }}"
     type: ed25519
 
-- name: APPLY - Copy terraform sources    # noqa risky-file-permissions
+- name: APPLY - Copy terraform sources
   copy:
-    src: "files/"
+    src: "hcloud/"
     dest: "{{ __terraform_module_working_dir }}/"
+    mode: "u+rwX,g+rX,o-rX"
 
 - name: "Terraform {{ tf_action }}"
   include_tasks: _terraform.yml

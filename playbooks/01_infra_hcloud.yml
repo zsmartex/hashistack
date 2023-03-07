@@ -7,7 +7,7 @@
     hcloud_token: "{{ lookup('env', 'HETZNER_TOKEN') }}"
     current_ssh_user: "{{ cloud_provider_config.sudo_user }}"
     private_key_file: "{{ workspace_ssh_private_key_file }}"
-    terraform_module_work_dir: "{{ workspace_tf_modules_dir }}/hcloud"
+    terraform_module_work_dir: "{{ workspace_tf_modules_dir }}"
     separate_consul_servers: "{{ cluster_config.separate_consul_servers }}"
     server_count: "{{ cluster_config.servers }}"
     vault_count: "{{ cluster_config.vault_servers }}"
