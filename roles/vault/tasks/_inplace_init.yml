@@ -1,9 +1,11 @@
 ---
 - name: Get vault status
   uri:
-    ca_path: "{{ __vault_ca_certificate }}"
     url: "{{ __vault_api.status }}"
     return_content: true
+    ca_path: "{{ __vault_ca_certificate }}"
+    client_cert: "{{ __vault_self_certificate }}"
+    client_key: "{{ __vault_self_private_key }}"
   register: _current_vault_status
   retries: 6
   delay: 10
@@ -16,13 +18,15 @@
   block:
     - name: Vault init
       uri:
-        ca_path: "{{ __vault_ca_certificate }}"
         url: "{{ __vault_api.init }}"
         method: POST
         body_format: json
         body:
           secret_shares: "{{ vault_unseal_key_shares }}"
           secret_threshold: "{{ vault_unseal_key_threshold }}"
+        ca_path: "{{ __vault_ca_certificate }}"
+        client_cert: "{{ __vault_self_certificate }}"
+        client_key: "{{ __vault_self_private_key }}"
         return_content: true
       register: _current_vault_init
       retries: 10
@@ -46,9 +50,11 @@
 
     - name: Get vault status
       uri:
-        ca_path: "{{ __vault_ca_certificate }}"
         url: "{{ __vault_api.status }}"
         return_content: true
+        ca_path: "{{ __vault_ca_certificate }}"
+        client_cert: "{{ __vault_self_certificate }}"
+        client_key: "{{ __vault_self_private_key }}"
       register: _current_vault_status
       retries: 6
       delay: 10

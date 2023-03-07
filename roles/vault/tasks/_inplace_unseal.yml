@@ -10,8 +10,10 @@
 
 - name: Get vault status
   uri:
-    ca_path: "{{ __vault_ca_certificate }}"
     url: "{{ __vault_api.status }}"
+    ca_path: "{{ __vault_ca_certificate }}"
+    client_cert: "{{ __vault_self_certificate }}"
+    client_key: "{{ __vault_self_private_key }}"
     return_content: true
   register: _current_vault_status
   when:
@@ -32,12 +34,14 @@
 
 - name: Vault unseal
   uri:
-    ca_path: "{{ __vault_ca_certificate }}"
     url: "{{ __vault_api.unseal }}"
     method: POST
     body_format: json
     body:
       key: "{{ _current_unseal_key }}"
+    ca_path: "{{ __vault_ca_certificate }}"
+    client_cert: "{{ __vault_self_certificate }}"
+    client_key: "{{ __vault_self_private_key }}"
     return_content: true
   loop: "{{ _vault_unseal_minimum_keys }}"
   loop_control:
@@ -47,8 +51,10 @@
 
 - name: Get vault status
   uri:
-    ca_path: "{{ __vault_ca_certificate }}"
     url: "{{ __vault_api.status }}"
+    ca_path: "{{ __vault_ca_certificate }}"
+    client_cert: "{{ __vault_self_certificate }}"
+    client_key: "{{ __vault_self_private_key }}"
     return_content: true
   register: _current_vault_status
   when:

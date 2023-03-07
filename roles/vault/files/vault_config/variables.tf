@@ -11,6 +11,16 @@ variable "vault_ca_cert_file" {
   default = null
 }
 
+variable "client_cert_file" {
+  type    = string
+  default = null
+}
+
+variable "client_key_file" {
+  type    = string
+  default = null
+}
+
 variable "vault_address" {}
 
 variable "nomad_allowed_vault_policies" {

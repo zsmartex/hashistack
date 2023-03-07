@@ -38,7 +38,6 @@ vault_unseal_key_threshold: 3
 #
 # ### Certificates
 #
-vault_use_custom_ca: true
 vault_local_unseal_file: "{{ vault_local_secret_dir }}/root_vault.yml"
 vault_local_ca_cert: "{{ vault_local_secret_dir }}/certificate-authority.crt"
 vault_local_cert: "{{ vault_local_secret_dir }}/server.crt"

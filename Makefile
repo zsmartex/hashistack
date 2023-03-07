@@ -78,6 +78,9 @@ stage_2_vault:
 stage_2_consul:
 	ansible-playbook ../../playbooks/21_consul_install.yml
 
+stage_2_nomad:
+	ansible-playbook ../../playbooks/22_nomad_install.yml
+
 stage_2: stage_2_vault # stage_2_consul
 
 encrypt:

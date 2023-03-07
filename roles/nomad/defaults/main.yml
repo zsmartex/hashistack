@@ -1,0 +1,37 @@
+---
+
+nomad_datacenter_name: "{{ workspace }}"
+nomad_version: "1.5.0-1"
+nomad_local_secrets_dir: "{{ workspace_secrets_dir }}"
+
+nomad_server_group: "nomad_servers"
+nomad_client_group: "client_servers"
+
+consul_connect_token_nomad_server: ~
+consul_connect_token_nomad_client: ~
+
+nomad_consul_address: "127.0.0.1:8501"
+nomad_consul_grpc_address: "127.0.0.1:8503"
+nomad_vault_address: "https://vault.service.consul:8200"
+nomad_vault_token: ~
+nomad_api_port: 4646
+nomad_address: "{{ private_ip }}"
+nomad_advertise_address: "{{ private_ip }}"
+
+nomad_data_path: /opt/nomad
+nomad_config_path: /etc/nomad.d
+
+nomad_bootstrap_expect: "{{ groups[nomad_server_group] | length }}"
+
+nomad_local_secret_file: "{{ workspace_secrets_dir }}/root_nomad.yml"
+
+nomad_connect_image: "envoyproxy/envoy-alpine:v1.21.2"
+
+nomad_local_ca_certificate: "{{ workspace_secrets_dir }}/certificate-authority.crt"
+nomad_local_cert_fullchain: "{{ workspace_secrets_dir }}/server-fullchain.crt"
+nomad_local_cert_key: "{{ workspace_secrets_dir }}/server.key"
+
+nomad_sysctl:
+  net.bridge.bridge-nf-call-arptables: "1"
+  net.bridge.bridge-nf-call-ip6tables: "1"
+  net.bridge.bridge-nf-call-iptables: "1"

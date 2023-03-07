@@ -13,9 +13,11 @@
     headers:
       X-Consul-Token: "{{ root_consul.SecretID }}"
     ca_path: "{{ consul_local_ca_certificate }}"
+    client_cert: "{{ consul_local_cert_fullchain }}"
+    client_key: "{{ consul_local_cert_private_key }}"
   register: _consul_ping_api
   until: _consul_ping_api.status == 200
-  retries: 2
+  retries: 10
   delay: 10
   delegate_to: localhost
   become: false
@@ -42,6 +44,8 @@
       datacenter: "{{ workspace }}"
       token: "{{ root_consul.SecretID }}"
       ca_file: "{{ consul_local_ca_certificate }}"
+      cert_file: "{{ consul_local_cert_fullchain }}"
+      key_file: "{{ consul_local_cert_private_key }}"
   register: tf_result
   delegate_to: localhost
   become: false
@@ -53,8 +57,8 @@
     mode: 0600
     content: |-
         ---
-        consul_connect_token_server: "{{ tf_result.outputs.consul_acl_nomad_server_token.value }}"
-        consul_connect_token_client: "{{ tf_result.outputs.consul_acl_nomad_client_token.value }}"
+        consul_connect_token_nomad_server: "{{ tf_result.outputs.consul_acl_nomad_server_token.value }}"
+        consul_connect_token_nomad_client: "{{ tf_result.outputs.consul_acl_nomad_client_token.value }}"
         consul_prometheus_token: "{{ tf_result.outputs.consul_acl_prometheus_token.value }}"
         consul_telemetry_token: "{{ tf_result.outputs.consul_acl_telemetry_token.value }}"
         consul_promtail_token: "{{ tf_result.outputs.consul_acl_promtail_token.value }}"

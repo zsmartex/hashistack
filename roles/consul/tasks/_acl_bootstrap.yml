@@ -6,7 +6,7 @@
   environment:
     CONSUL_HTTP_ADDR: "https://{{ private_ip }}:{{ consul_api_port }}"
     CONSUL_HTTP_SSL: "true"
-    CONSUL_HTTP_SSL_VERIFY: "false"
+    CONSUL_HTTP_SSL_VERIFY: "true"
     CONSUL_CACERT: "{{ __consul_tls_ca_certificate_dir }}/{{ __consul_tls_ca_crt }}"
     CONSUL_CLIENT_CERT: "{{ __consul_tls_dir }}/{{ __consul_tls_server_crt }}"
     CONSUL_CLIENT_KEY: "{{ __consul_tls_dir }}/{{ __consul_tls_server_key }}"

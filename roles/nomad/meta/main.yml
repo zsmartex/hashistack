@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  role_name: nomad
+  namespace: zsmartex
+  description: >-
+    HashiCorp Nomad install.
+  author: Huu Ha
+  company: ZSmartex
+  license: MIT
+  min_ansible_version: "2.11"
+
+  platforms:
+    - name: Debian
+      versions:
+        - bullseye
+
+dependencies: []

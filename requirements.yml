@@ -20,4 +20,7 @@ collections:
     version: ">=0.1.4"
 
 roles:
-  - name: robertdebock.vault_initialize
+  - src: https://github.com/robertdebock/ansible-role-dnsmasq.git
+    name: robertdebock.dnsmasq
+    scm: git
+    version: master

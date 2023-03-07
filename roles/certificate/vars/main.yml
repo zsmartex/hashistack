@@ -1,6 +1,6 @@
 ---
 ca_certificate_path: "{{ workspace_secrets_dir }}/certificate-authority.crt"
-ca_private_key_path: "{{ workspace_secrets_dir }}/certificate-authority-key.key"
+ca_private_key_path: "{{ workspace_secrets_dir }}/certificate-authority.key"
 
 ca_common_name: "ZSmartex Cryptocurrency Exchange CA"
 

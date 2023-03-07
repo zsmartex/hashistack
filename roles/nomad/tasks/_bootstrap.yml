@@ -1,0 +1,52 @@
+---
+- name: Bootstrap
+  debug:
+    msg: "Starting nomad bootstrap"
+    verbosity: 1
+
+- name: Get nomad status
+  uri:
+    url: "{{ __nomad_api.status }}"
+    return_content: true
+    ca_path: "{{ __nomad_tls_ca_certificate_dir }}/{{ __nomad_tls_ca_crt }}"
+    client_cert: "{{ __nomad_tls_dir }}/{{ __nomad_tls_server_crt }}"
+    client_key: "{{ __nomad_tls_dir }}/{{ __nomad_tls_server_key }}"
+  register: _current_nomad_status
+  retries: 10
+  delay: 10
+  until:
+    - _current_nomad_status.status == 200
+
+- name: Check nomad is bootstraped
+  stat:
+    path: "{{ nomad_local_secret_file }}"
+  register: bootstrap_stat_result
+  no_log: true
+  run_once: true
+  become: false
+  delegate_to: localhost
+
+- name: Start bootstrap nomad
+  block:
+    - name: Bootstrap acl
+      uri:
+        url: "{{ __nomad_api.acl_bootstrap }}"
+        method: POST
+        body_format: json
+        return_content: true
+        ca_path: "{{ __nomad_tls_ca_certificate_dir }}/{{ __nomad_tls_ca_crt }}"
+        client_cert: "{{ __nomad_tls_dir }}/{{ __nomad_tls_server_crt }}"
+        client_key: "{{ __nomad_tls_dir }}/{{ __nomad_tls_server_key }}"
+      register: _nomad_acl_bootstrap
+      run_once: true
+
+    - name: Store nomad bootstrap secrets
+      copy:
+        dest: "{{ nomad_local_secret_file }}"
+        mode: 0600
+        content: |-
+          ---
+          {{ {'root_nomad': _nomad_acl_bootstrap.json} | to_nice_yaml(indent=2) }}
+      become: false
+      delegate_to: localhost
+  when: not  bootstrap_stat_result.stat.exists

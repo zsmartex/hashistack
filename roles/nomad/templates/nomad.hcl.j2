@@ -1,0 +1,97 @@
+datacenter = "{{ nomad_datacenter_name }}"
+data_dir = "{{ nomad_data_path }}"
+name = "{{ inventory_hostname | regex_replace('\.','-') }}"
+
+tls {
+  http = true
+  rpc  = true
+  ca_file     = "{{ __nomad_tls_ca_certificate_dir }}/{{ __nomad_tls_ca_crt }}"
+  cert_file   = "{{ __nomad_tls_dir }}/{{ __nomad_tls_server_crt }}"
+  key_file    = "{{ __nomad_tls_dir }}/{{ __nomad_tls_server_key }}"
+  verify_server_hostname = true
+  verify_https_client    = true
+}
+
+acl {
+  enabled = true
+}
+
+consul {
+  token            = "{{ __nomad_is_server | ternary(consul_connect_token_nomad_server, consul_connect_token_nomad_client) }}"
+  ssl              = true
+  verify_ssl       = true
+  address          = "{{ nomad_consul_address }}"
+  grpc_address     = "{{ nomad_consul_grpc_address }}"
+  ca_file          = "{{ __nomad_tls_ca_certificate_dir }}/{{ __nomad_tls_ca_crt }}"
+  cert_file        = "{{ __nomad_tls_dir }}/{{ __nomad_tls_server_crt }}"
+  key_file         = "{{ __nomad_tls_dir }}/{{ __nomad_tls_server_key }}"
+  auto_advertise   = true
+  server_auto_join = true
+  client_auto_join = true
+}
+
+{% if __nomad_is_server %}
+advertise {
+  http = "{{ nomad_advertise_address }}"
+  rpc = "{{ nomad_advertise_address }}"
+  serf = "{{ nomad_advertise_address }}"
+}
+
+server {
+  enabled = true
+  bootstrap_expect = {{ nomad_bootstrap_expect }}
+  encrypt = "{{ __nomad_encrypt_key }}"
+}
+
+client {
+  enabled = false
+}
+
+vault {
+  enabled          = true
+  address          = "{{ nomad_vault_address }}"
+  task_token_ttl   = "1h"
+  create_from_role = "nomad_cluster"
+  token            = "{{ nomad_vault_token }}"
+  tls_skip_verify  = true
+  ca_file          = "{{ __nomad_tls_ca_certificate_dir }}/{{ __nomad_tls_ca_crt }}"
+  cert_file        = "{{ __nomad_tls_dir }}/{{ __nomad_tls_server_crt }}"
+  key_file         = "{{ __nomad_tls_dir }}/{{ __nomad_tls_server_key }}"
+}
+{% else %}
+bind_addr = "{{ private_ip }}"
+
+server {
+  enabled = false
+}
+
+client {
+  enabled = true
+
+  meta {    
+    "connect.sidecar_image" = "{{ nomad_connect_image }}"  
+    "connect.gateway_image" = "{{ nomad_connect_image }}"  
+    "connect.log_level"     = "info"
+  }
+}
+
+vault {
+  enabled = true
+  address = "{{ nomad_vault_address }}"
+  task_token_ttl = "1h"
+}
+
+plugin "docker" {
+  config {
+    volumes {
+      enabled      = true
+    }
+  }
+}
+
+plugin "raw_exec" {
+  config {
+    enabled = true
+  }
+}
+{% endif %}

@@ -12,7 +12,7 @@ storage "raft" {
 {% for partner_peer in __vault_server_partners %}
   retry_join {
     leader_api_addr         = "{{ vault_api_protocol }}://{{ partner_peer }}:{{ vault_api_port }}"
-{% if vault_use_custom_ca %}    leader_ca_cert_file     = "{{ __vault_ca_certificate }}"{% endif %}
+    leader_ca_cert_file     = "{{ __vault_ca_certificate }}"
     leader_client_key_file  = "{{ __vault_self_private_key }}"
     leader_client_cert_file = "{{ __vault_self_certificate }}"
   }
@@ -24,7 +24,8 @@ listener "tcp" {
   cluster_address    = "{{ vault_cluster_listener }}"
   tls_cert_file      = "{{ __vault_self_certificate }}"
   tls_key_file       = "{{ __vault_self_private_key }}"
-{% if vault_use_custom_ca %}  tls_client_ca_file = "{{ __vault_ca_certificate }}"{% endif %}
+  tls_client_ca_file = "{{ __vault_ca_certificate }}"
+  tls_require_and_verify_client_cert = true
 }
 
 telemetry {

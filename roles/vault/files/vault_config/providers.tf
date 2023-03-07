@@ -9,4 +9,8 @@ terraform {
 
 provider "vault" {
   ca_cert_file = var.vault_ca_cert_file
+  client_auth {
+    cert_file = var.client_cert_file
+    key_file  = var.client_key_file
+  }
 }

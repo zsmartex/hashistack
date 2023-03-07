@@ -1,16 +1,16 @@
 ---
 - name: Stage 2 - Copy certificate to consul servers
-  hosts: hashistack_cluster
+  hosts: nomad_servers,client_servers
   become: true
   gather_facts: true
   pre_tasks:
-    - name: Add consul group
+    - name: Add nomad group
       group:
-        name: "consul"
-    - name: Add consul user
+        name: "nomad"
+    - name: Add nomad user
       user:
-        name: "consul"
-        group: "consul"
+        name: "nomad"
+        group: "nomad"
     - name: Creates data dir
       file:
         path: '{{ item["mount_path"] }}/{{ item["name"] }}'
@@ -28,12 +28,5 @@
         group: "{{ item['group'] }}"
       loop: "{{ volumes }}"
   roles:
-    - role: envoy
-    - role: consul
-    - role: robertdebock.dnsmasq
-      dnsmasq_set_user: consul
-      dnsmasq_group: consul
-      dnsmasq_servers:
-        - domain: consul
-          nameserver: "127.0.0.1#8600"
-          port: 8600
+    - role: rtnp.galaxie_clans.container
+    - role: nomad

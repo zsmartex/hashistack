@@ -33,15 +33,22 @@
     timeout: 60
   when: inventory_hostname in groups[consul_server_group_name]
 
+
+- name: Check consul is bootstraped
+  stat:
+    path: "{{ workspace_secrets_dir }}/root_consul.yml"
+  register: bootstrap_stat_result
+  no_log: true
+  run_once: true
+  become: false
+  delegate_to: localhost
+
 - name: Bootstrap acl
   include_tasks: _acl_bootstrap.yml
   when:
     - inventory_hostname in groups[consul_bootstrap_group_name]
     - inventory_hostname == groups[consul_bootstrap_group_name][0]
-    - >-
-      ansible_local.consul is not defined
-      or ansible_local.consul.applied is not defined
-      or not ansible_local.consul.applied
+    - not bootstrap_stat_result.stat.exists
 
 - name: Configure Vault instance using terraform
   include_tasks: _tf_configure.yml

@@ -1,0 +1,42 @@
+---
+__nomad_hashicorp_apt_key: >-
+  https://apt.releases.hashicorp.com/gpg
+__nomad_hashicorp_apt_repository: >-
+  deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main
+
+__nomad_data_dir: "{{ nomad_data_path }}/data"
+__nomad_tls_dir: "{{ nomad_config_path }}/ssl"
+
+__nomad_expected_directories:
+  - "{{ nomad_data_path }}"
+  - "{{ nomad_config_path }}"
+  - "{{ __nomad_tls_dir }}"
+
+__nomad_is_server: >-
+  {{
+    nomad_server_group is defined
+    and nomad_server_group | length > 0
+    and inventory_hostname in groups[nomad_server_group]
+  }}
+__nomad_is_client: "{{ not __nomad_is_server }}"
+
+__nomad_tls_ca_certificate_dir: "/usr/local/share/ca-certificates"
+
+__nomad_ssl_cert_group: "ssl-cert"
+
+__nomad_env_file: "{{ nomad_config_path }}/nomad.env"
+__nomad_conf_file: "{{ nomad_config_path }}/nomad.hcl"
+
+__nomad_vault_ca_certificate: "{{ __nomad_tls_ca_certificate_dir }}/vault.root_ca.crt"
+
+__nomad_encrypt_key_local_path: "{{ nomad_local_secrets_dir }}/nomad.encrypt_key"
+__nomad_encrypt_key: >-
+  {{ lookup('file', __nomad_encrypt_key_local_path) }}
+
+__nomad_tls_ca_crt: "nomad-ca.crt"
+__nomad_tls_server_crt: "server-fullchain.crt"
+__nomad_tls_server_key: "server.key"
+
+__nomad_api:
+  acl_bootstrap: "https://{{ nomad_address }}:{{ nomad_api_port }}/v1/acl/bootstrap"
+  status: "https://{{ nomad_address }}:{{ nomad_api_port }}/v1/status/leader"
